@@ -542,7 +542,7 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
         child: child,
       ),
     );
-    return child;
+    return const SizedBox.shrink();
   }
 
   /// Back button.
@@ -910,7 +910,7 @@ class DefaultAssetPickerBuilderDelegate
   AssetPickerAppBar appBar(BuildContext context) {
     return AssetPickerAppBar(
       backgroundColor: theme.appBarTheme.backgroundColor,
-      centerTitle: isAppleOS,
+      centerTitle: true,
       title: Semantics(
         onTapHint: semanticsTextDelegate.sActionSwitchPathLabel,
         child: pathEntitySelector(context),
