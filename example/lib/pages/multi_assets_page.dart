@@ -22,8 +22,24 @@ class _MultiAssetsPageState extends State<MultiAssetsPage>
   @override
   List<PickMethod> get pickMethods {
     return <PickMethod>[
+      PickMethod(
+        icon: '🎭',
+        name: 'Image Picker',
+        description: 'Pick assets',
+        method: (BuildContext context, List<AssetEntity> assets) {
+          return AssetPicker.pickAssets(
+            context,
+            pickerConfig: AssetPickerConfig(
+              maxAssets: 3,
+              requestType: RequestType.image,
+              themeColor: const Color(0xff0079F2),
+              textDelegate: const EnglishAssetPickerTextDelegate(),
+            ),
+          );
+        },
+      ),
       PickMethod.common(maxAssetsCount),
-      PickMethod.image(maxAssetsCount),
+      PickMethod.image(maxAssetsCount,),
       PickMethod.video(maxAssetsCount),
       PickMethod.audio(maxAssetsCount),
       PickMethod.camera(

@@ -140,11 +140,11 @@ abstract class AssetPickerViewerBuilderDelegate<Asset, Path> {
 
   /// Height for bottom preview widget.
   /// 底栏预览部件的高度
-  double get bottomPreviewHeight => 90.0;
+  double get bottomPreviewHeight => 80.0;
 
   /// Height for bottom bar widget.
   /// 底栏部件的高度
-  double get bottomBarHeight => 50.0;
+  double get bottomBarHeight => 70.0;
 
   double get bottomDetailHeight => bottomPreviewHeight + bottomBarHeight;
 
@@ -570,7 +570,7 @@ class DefaultAssetPickerViewerBuilderDelegate
                   child: ListView.builder(
                     controller: previewingListController,
                     scrollDirection: Axis.horizontal,
-                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
                     physics: const ClampingScrollPhysics(),
                     itemCount: count,
                     itemBuilder: bottomDetailItemBuilder,
@@ -591,9 +591,9 @@ class DefaultAssetPickerViewerBuilderDelegate
                 color: _backgroundColor,
               ),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  const Spacer(),
+                  // const Spacer(),
                   if (isAppleOS && (provider != null || isWeChatMoment))
                     confirmButton(context)
                   else
@@ -609,7 +609,7 @@ class DefaultAssetPickerViewerBuilderDelegate
 
   @override
   Widget bottomDetailItemBuilder(BuildContext context, int index) {
-    const double padding = 8.0;
+    const double padding = 4.0;
 
     void onTap(AssetEntity asset) {
       final int page;
@@ -762,18 +762,18 @@ class DefaultAssetPickerViewerBuilderDelegate
                   ),
                 ),
               ),
-            if (isAppleOS && provider != null)
-              Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: Semantics(
-                    sortKey: ordinalSortKey(0.2),
-                    child: selectButton(context),
-                  ),
-                ),
-              )
-            else if (isAppleOS)
-              const Spacer(),
+            // if (isAppleOS && provider != null)
+            //   Expanded(
+            //     child: Align(
+            //       alignment: AlignmentDirectional.centerEnd,
+            //       child: Semantics(
+            //         sortKey: ordinalSortKey(0.2),
+            //         child: selectButton(context),
+            //       ),
+            //     ),
+            //   )
+            // else if (isAppleOS)
+            //   const Spacer(),
             if (!isAppleOS && (provider != null || isWeChatMoment))
               Expanded(
                 child: Align(
@@ -811,17 +811,18 @@ class DefaultAssetPickerViewerBuilderDelegate
             'when the special type is not WeChat moment.',
           );
           return MaterialButton(
-            minWidth: () {
-              if (isWeChatMoment && hasVideo) {
-                return 48.0;
-              }
-              return provider!.isSelectedNotEmpty ? 48.0 : 20.0;
-            }(),
-            height: 32.0,
+            // minWidth: () {
+            //   if (isWeChatMoment && hasVideo) {
+            //     return 48.0;
+            //   }
+            //   return provider!.isSelectedNotEmpty ? 48.0 : 20.0;
+            // }(),
+            minWidth: 160,
+            height: 45,
             padding: const EdgeInsets.symmetric(horizontal: 12.0),
             color: themeData.colorScheme.secondary,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(3.0),
+              borderRadius: BorderRadius.circular(10.0),
             ),
             child: ScaleText(
               () {

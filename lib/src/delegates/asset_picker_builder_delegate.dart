@@ -513,36 +513,65 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
   /// Action bar widget aligned to bottom.
   /// 底部操作栏部件
   Widget bottomActionBar(BuildContext context) {
-    Widget child = Container(
-      height: bottomActionBarHeight + context.bottomPadding,
-      padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(
-        bottom: context.bottomPadding,
-      ),
-      color: theme.primaryColor.withOpacity(isAppleOS ? 0.90 : 1),
-      child: Row(
-        children: <Widget>[
-          if (!isSingleAssetMode || !isAppleOS) previewButton(context),
-          if (isAppleOS) const Spacer(),
-          if (isAppleOS) confirmButton(context),
+    // Widget child = Container(
+    //   height: bottomActionBarHeight + context.bottomPadding,
+    //   padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(
+    //     bottom: context.bottomPadding,
+    //   ),
+    //   color: theme.primaryColor.withOpacity(isAppleOS ? 0.90 : 1),
+    //   child: Row(
+    //     children: <Widget>[
+    //       if (!isSingleAssetMode || !isAppleOS) previewButton(context),
+    //       if (isAppleOS) const Spacer(),
+    //       if (isAppleOS) confirmButton(context),
+    //     ],
+    //   ),
+    // );
+    // if (isPermissionLimited) {
+    //   child = Column(
+    //     mainAxisSize: MainAxisSize.min,
+    //     children: <Widget>[accessLimitedBottomTip(context), child],
+    //   );
+    // }
+    // child = ClipRect(
+    //   child: BackdropFilter(
+    //     filter: ui.ImageFilter.blur(
+    //       sigmaX: appleOSBlurRadius,
+    //       sigmaY: appleOSBlurRadius,
+    //     ),
+    //     child: child,
+    //   ),
+    // );
+    final double heightBottomAction = bottomActionBarHeight + context.bottomPadding;
+    Widget child = SizedBox(
+      height: heightBottomAction + 30,
+      child: Stack(
+        alignment: Alignment.bottomCenter,
+        children: [
+          Container(
+            height: heightBottomAction,
+            padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(
+              bottom: context.bottomPadding,
+            ),
+            color: Colors.black87.withOpacity(0.7),
+          ),
+          Positioned(
+            top: 0,
+            right: 20,
+            child: Container(
+              height: 60,
+              width: 60,
+              decoration: BoxDecoration(
+                color: Colors.grey,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              child: Icon(Icons.send, color: Colors.blue),
+            ),
+          )
         ],
       ),
     );
-    if (isPermissionLimited) {
-      child = Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[accessLimitedBottomTip(context), child],
-      );
-    }
-    child = ClipRect(
-      child: BackdropFilter(
-        filter: ui.ImageFilter.blur(
-          sigmaX: appleOSBlurRadius,
-          sigmaY: appleOSBlurRadius,
-        ),
-        child: child,
-      ),
-    );
-    return const SizedBox.shrink();
+    return child;
   }
 
   /// Back button.
@@ -553,7 +582,10 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
       child: IconButton(
         onPressed: Navigator.of(context).maybePop,
         tooltip: MaterialLocalizations.of(context).backButtonTooltip,
-        icon: const Icon(Icons.close),
+        icon: const Icon(
+          Icons.close,
+          color: lightColor,
+        ),
       ),
     );
   }
@@ -909,6 +941,7 @@ class DefaultAssetPickerBuilderDelegate
   @override
   AssetPickerAppBar appBar(BuildContext context) {
     return AssetPickerAppBar(
+      // backgroundColor: lightColor,
       backgroundColor: theme.appBarTheme.backgroundColor,
       centerTitle: true,
       title: Semantics(
@@ -928,7 +961,8 @@ class DefaultAssetPickerBuilderDelegate
           ? <Widget>[confirmButton(context)]
           : null,
       actionsPadding: const EdgeInsetsDirectional.only(end: 14),
-      blurRadius: isAppleOS ? appleOSBlurRadius : 0,
+      // blurRadius: isAppleOS ? appleOSBlurRadius : 0,
+      blurRadius: 0,
     );
   }
 
@@ -974,13 +1008,18 @@ class DefaultAssetPickerBuilderDelegate
           excludeSemantics: isSwitchingPath,
           child: RepaintBoundary(
             child: Stack(
+              alignment: Alignment.center,
               children: <Widget>[
                 Positioned.fill(child: assetsGridBuilder(context)),
-                if ((!isSingleAssetMode || isAppleOS) && isPreviewEnabled)
-                  Positioned.fill(
-                    top: null,
-                    child: bottomActionBar(context),
-                  ),
+                // if ((!isSingleAssetMode || isAppleOS) && isPreviewEnabled)
+                //   Positioned.fill(
+                //     top: null,
+                //     child: bottomActionBar(context),
+                //   ),
+                Positioned(
+                  bottom: 12,
+                  child: confirmButton(context),
+                ),
               ],
             ),
           ),
@@ -1472,13 +1511,14 @@ class DefaultAssetPickerBuilderDelegate
     return Consumer<DefaultAssetPickerProvider>(
       builder: (_, DefaultAssetPickerProvider p, __) {
         return MaterialButton(
-          minWidth: p.isSelectedNotEmpty ? 48 : 20,
-          height: appBarItemHeight,
+          // minWidth: p.isSelectedNotEmpty ? 48 : 20,
+          minWidth: 160,
+          height: 45,
           padding: const EdgeInsets.symmetric(horizontal: 12),
           disabledColor: theme.dividerColor,
           color: p.isSelectedNotEmpty ? themeColor : theme.dividerColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(3),
+            borderRadius: BorderRadius.circular(10),
           ),
           child: ScaleText(
             p.isSelectedNotEmpty && !isSingleAssetMode
@@ -1708,6 +1748,7 @@ class DefaultAssetPickerBuilderDelegate
           style: const TextStyle(
             fontSize: 17,
             fontWeight: FontWeight.normal,
+            color: lightColor,
           ),
           maxLines: 1,
           overflow: TextOverflow.fade,
@@ -1780,10 +1821,11 @@ class DefaultAssetPickerBuilderDelegate
                       child: w,
                     );
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.keyboard_arrow_down,
                     size: 20,
-                    color: theme.colorScheme.primary,
+                    // color: theme.colorScheme.primary,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -1845,7 +1887,7 @@ class DefaultAssetPickerBuilderDelegate
           onTapHint: semanticsTextDelegate.sActionSwitchPathLabel,
           button: false,
           child: Material(
-            type: MaterialType.transparency,
+            // type: MaterialType.transparency,
             child: InkWell(
               splashFactory: InkSplash.splashFactory,
               onTap: () {

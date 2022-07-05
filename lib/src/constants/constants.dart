@@ -8,5 +8,7 @@ import 'package:photo_manager/photo_manager.dart';
 /// Default theme color from WeChat.
 const Color defaultThemeColorWeChat = Color(0xff00bc56);
 
+const Color lightColor = Color(0xffffffff);
+const Color darkColor = Color(0xff000000);
 const ThumbnailSize defaultAssetGridPreviewSize = ThumbnailSize.square(200);
 const ThumbnailSize defaultPathThumbnailSize = ThumbnailSize.square(80);
