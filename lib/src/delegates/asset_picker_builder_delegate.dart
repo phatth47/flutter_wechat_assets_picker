@@ -957,10 +957,10 @@ class DefaultAssetPickerBuilderDelegate
       // - On iOS, show if no preview and multi asset mode. This is because for iOS
       //   the [bottomActionBar] has the confirm button, but if no preview,
       //   [bottomActionBar] is not displayed.
-      actions: (!isAppleOS || !isPreviewEnabled) &&
-              (isPreviewEnabled || !isSingleAssetMode)
-          ? <Widget>[confirmButton(context)]
-          : null,
+      // actions: (!isAppleOS || !isPreviewEnabled) &&
+      //         (isPreviewEnabled || !isSingleAssetMode)
+      //     ? <Widget>[confirmButton(context)]
+      //     : null,
       actionsPadding: const EdgeInsetsDirectional.only(end: 14),
       // blurRadius: isAppleOS ? appleOSBlurRadius : 0,
       blurRadius: 0,
@@ -1024,25 +1024,23 @@ class DefaultAssetPickerBuilderDelegate
                             horizontal: 20,
                             vertical: 12,
                           ),
-                          child: Flexible(
-                            child: Text.rich(
-                              TextSpan(
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: textDelegate.accessAllTip,
-                                  ),
-                                  TextSpan(
-                                    text: ' '
-                                        '${textDelegate.goToSystemSettings}',
-                                    style: TextStyle(color: interactiveTextColor(context)),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = PhotoManager.openSetting,
-                                  ),
-                                ],
-                              ),
-                              style: context.themeData.textTheme.caption?.copyWith(
-                                fontSize: 14,
-                              ),
+                          child: Text.rich(
+                            TextSpan(
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: textDelegate.accessAllTip,
+                                ),
+                                TextSpan(
+                                  text: ' '
+                                      '${textDelegate.goToSystemSettings}',
+                                  style: TextStyle(color: interactiveTextColor(context)),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = PhotoManager.openSetting,
+                                ),
+                              ],
+                            ),
+                            style: context.themeData.textTheme.caption?.copyWith(
+                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -1249,7 +1247,7 @@ class DefaultAssetPickerBuilderDelegate
                       anchor: effectiveShouldRevertGrid ? anchor : 0,
                       center: effectiveShouldRevertGrid ? gridRevertKey : null,
                       slivers: <Widget>[
-                        if (isAppleOS) SliverGap.v(topPadding),
+                        SliverGap.v(topPadding),
                         _sliverGrid(_, assets),
                         // Ignore the gap when the [anchor] is not equal to 1.
                         if (effectiveShouldRevertGrid && anchor == 1)
@@ -1675,7 +1673,8 @@ class DefaultAssetPickerBuilderDelegate
   @override
   Widget pathEntityListWidget(BuildContext context) {
     return Positioned.fill(
-      top: isAppleOS ? context.topPadding + kToolbarHeight : 0,
+      // top: isAppleOS ? context.topPadding + kToolbarHeight : 0,
+      top: context.topPadding + kToolbarHeight,
       bottom: null,
       child: ValueListenableBuilder<bool>(
         valueListenable: isSwitchingPath,
@@ -2266,11 +2265,12 @@ class DefaultAssetPickerBuilderDelegate
             child: Stack(
               fit: StackFit.expand,
               children: <Widget>[
-                if (isAppleOS)
-                  appleOSLayout(context)
-                else
-                  androidLayout(context),
-                if (Platform.isIOS) iOSPermissionOverlay(context),
+                appleOSLayout(context)
+                // if (isAppleOS)
+                //   appleOSLayout(context)
+                // else
+                //   androidLayout(context),
+                // if (Platform.isIOS) iOSPermissionOverlay(context),
               ],
             ),
           ),

@@ -597,7 +597,7 @@ class DefaultAssetPickerViewerBuilderDelegate
                   if (isAppleOS && (provider != null || isWeChatMoment))
                     confirmButton(context)
                   else
-                    selectButton(context),
+                    confirmButton(context),
                 ],
               ),
             ),
@@ -774,21 +774,21 @@ class DefaultAssetPickerViewerBuilderDelegate
             //   )
             // else if (isAppleOS)
             //   const Spacer(),
-            if (!isAppleOS && (provider != null || isWeChatMoment))
-              Expanded(
-                child: Align(
-                  alignment: AlignmentDirectional.centerEnd,
-                  child: Semantics(
-                    sortKey: ordinalSortKey(0.3),
-                    child: Padding(
-                      padding: const EdgeInsetsDirectional.only(end: 14),
-                      child: confirmButton(context),
-                    ),
-                  ),
-                ),
-              )
-            else if (!isAppleOS)
-              const Spacer(),
+            // if (!isAppleOS && (provider != null || isWeChatMoment))
+            //   Expanded(
+            //     child: Align(
+            //       alignment: AlignmentDirectional.centerEnd,
+            //       child: Semantics(
+            //         sortKey: ordinalSortKey(0.3),
+            //         child: Padding(
+            //           padding: const EdgeInsetsDirectional.only(end: 14),
+            //           child: confirmButton(context),
+            //         ),
+            //       ),
+            //     ),
+            //   )
+            // else if (!isAppleOS)
+            const Spacer(),
           ],
         ),
       ),
