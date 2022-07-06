@@ -29,11 +29,11 @@ class _MultiAssetsPageState extends State<MultiAssetsPage>
         method: (BuildContext context, List<AssetEntity> assets) {
           return AssetPicker.pickAssets(
             context,
-            pickerConfig: AssetPickerConfig(
+            pickerConfig: const AssetPickerConfig(
               maxAssets: 3,
               requestType: RequestType.image,
-              themeColor: const Color(0xff0079F2),
-              textDelegate: const EnglishAssetPickerTextDelegate(),
+              themeColor: Color(0xff0079F2),
+              textDelegate: VietnameseAssetPickerTextDelegate(),
             ),
           );
         },

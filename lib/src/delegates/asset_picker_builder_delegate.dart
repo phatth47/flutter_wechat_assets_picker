@@ -542,7 +542,8 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     //     child: child,
     //   ),
     // );
-    final double heightBottomAction = bottomActionBarHeight + context.bottomPadding;
+    final double heightBottomAction =
+        bottomActionBarHeight + context.bottomPadding;
     Widget child = SizedBox(
       height: heightBottomAction + 30,
       child: Stack(
@@ -1010,7 +1011,46 @@ class DefaultAssetPickerBuilderDelegate
             child: Stack(
               alignment: Alignment.center,
               children: <Widget>[
-                Positioned.fill(child: assetsGridBuilder(context)),
+                Positioned.fill(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      if (isPermissionLimited) ...<Widget>[
+                        SizedBox(
+                          height: context.topPadding + kToolbarHeight,
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 12,
+                          ),
+                          child: Flexible(
+                            child: Text.rich(
+                              TextSpan(
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: textDelegate.accessAllTip,
+                                  ),
+                                  TextSpan(
+                                    text: ' '
+                                        '${textDelegate.goToSystemSettings}',
+                                    style: TextStyle(color: interactiveTextColor(context)),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = PhotoManager.openSetting,
+                                  ),
+                                ],
+                              ),
+                              style: context.themeData.textTheme.caption?.copyWith(
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      Expanded(child: assetsGridBuilder(context)),
+                    ],
+                  ),
+                ),
                 // if ((!isSingleAssetMode || isAppleOS) && isPreviewEnabled)
                 //   Positioned.fill(
                 //     top: null,
@@ -1112,7 +1152,8 @@ class DefaultAssetPickerBuilderDelegate
         // [gridCount] since every grid item is squeezed by the [itemSpacing],
         // and it's actual size is reduced with [itemSpacing / gridCount].
         final double dividedSpacing = itemSpacing / gridCount;
-        final double topPadding = context.topPadding + kToolbarHeight;
+        final double topPadding =
+            isPermissionLimited ? 0 : context.topPadding + kToolbarHeight;
 
         Widget _sliverGrid(BuildContext context, List<AssetEntity> assets) {
           return SliverGrid(
@@ -1208,8 +1249,7 @@ class DefaultAssetPickerBuilderDelegate
                       anchor: effectiveShouldRevertGrid ? anchor : 0,
                       center: effectiveShouldRevertGrid ? gridRevertKey : null,
                       slivers: <Widget>[
-                        if (isAppleOS)
-                          SliverGap.v(context.topPadding + kToolbarHeight),
+                        if (isAppleOS) SliverGap.v(topPadding),
                         _sliverGrid(_, assets),
                         // Ignore the gap when the [anchor] is not equal to 1.
                         if (effectiveShouldRevertGrid && anchor == 1)

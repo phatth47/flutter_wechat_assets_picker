@@ -172,7 +172,7 @@ class EnglishAssetPickerTextDelegate extends AssetPickerTextDelegate {
   String get languageCode => 'en';
 
   @override
-  String get confirm => 'Confirm';
+  String get confirm => 'Send';
 
   @override
   String get cancel => 'Cancel';
@@ -843,4 +843,99 @@ class FrenchAssetPickerTextDelegate extends AssetPickerTextDelegate {
 
   @override
   String get sUnitAssetCountLabel => 'quantité';
+}
+
+/// [AssetPickerTextDelegate] implements with Vietnamese.
+/// Vietnamese Localization
+class VietnameseAssetPickerTextDelegate extends AssetPickerTextDelegate {
+  const VietnameseAssetPickerTextDelegate();
+
+  @override
+  String get languageCode => 'vn';
+
+  @override
+  String get confirm => 'Gửi';
+
+  @override
+  String get cancel => 'Hủy';
+
+  @override
+  String get edit => 'Chỉnh sửa';
+
+  @override
+  String get gifIndicator => 'GIF';
+
+  @override
+  String get loadFailed => 'Thất bại';
+
+  @override
+  String get original => 'Nguồn';
+
+  @override
+  String get preview => 'Xem trước';
+
+  @override
+  String get select => 'Chọn';
+
+  @override
+  String get emptyList => 'Rỗng';
+
+  @override
+  String get unSupportedAssetType => 'Không hỗ trợ định dạng HEIC';
+
+  @override
+  String get unableToAccessAll => 'Không thể truy cập tất cả hình ảnh';
+
+  @override
+  String get viewingLimitedAssetsTip =>
+      'Chỉ xem các nội dung và album có thể truy cập vào ứng dụng.';
+
+  @override
+  String get changeAccessibleLimitedAssets =>
+      'Cập nhật nội dung có thể truy cập';
+
+  @override
+  String get accessAllTip => 'Bạn đã cấp quyền cho Octosells chọn một vài ảnh nhất định';
+
+  @override
+  String get goToSystemSettings => 'Thay đổi quyền tại đây';
+
+  @override
+  String get accessLimitedAssets => 'Tiếp tục với quyền truy cập hạn chế';
+
+  @override
+  String get accessiblePathName => 'Có thể truy cập';
+
+  @override
+  String get sTypeAudioLabel => 'Âm thanh';
+
+  @override
+  String get sTypeImageLabel => 'Hình ảnh';
+
+  @override
+  String get sTypeVideoLabel => 'Video';
+
+  @override
+  String get sTypeOtherLabel => 'Nội dung khác';
+
+  @override
+  String get sActionPlayHint => 'chơi';
+
+  @override
+  String get sActionPreviewHint => 'xem trước';
+
+  @override
+  String get sActionSelectHint => 'chọn';
+
+  @override
+  String get sActionSwitchPathLabel => 'switch path';
+
+  @override
+  String get sActionUseCameraHint => 'use camera';
+
+  @override
+  String get sNameDurationLabel => 'duration';
+
+  @override
+  String get sUnitAssetCountLabel => 'count';
 }
