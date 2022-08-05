@@ -10,7 +10,6 @@ import 'package:photo_manager/photo_manager.dart';
 import '../constants/config.dart';
 import '../constants/constants.dart';
 import '../internal/methods.dart';
-import '../internal/singleton.dart';
 import '../provider/asset_picker_provider.dart';
 import '../widget/asset_picker.dart';
 import '../widget/asset_picker_page_route.dart';
@@ -33,11 +32,11 @@ class AssetPickerDelegate {
   ///  * [PermissionState] which defined all states of required permissions.
   /// {@endtemplate}
   Future<PermissionState> permissionCheck() async {
-    final PermissionState _ps = await PhotoManager.requestPermissionExtend();
-    if (_ps != PermissionState.authorized && _ps != PermissionState.limited) {
-      throw StateError('Permission state error with $_ps.');
+    final PermissionState ps = await PhotoManager.requestPermissionExtend();
+    if (ps != PermissionState.authorized && ps != PermissionState.limited) {
+      throw StateError('Permission state error with $ps.');
     }
-    return _ps;
+    return ps;
   }
 
   /// {@template wechat_assets_picker.delegates.AssetPickerDelegate.pickAssets}
@@ -62,11 +61,17 @@ class AssetPickerDelegate {
   /// {@endtemplate}
   Future<List<AssetEntity>?> pickAssets(
     BuildContext context, {
+    Key? key,
     AssetPickerConfig pickerConfig = const AssetPickerConfig(),
     bool useRootNavigator = true,
     AssetPickerPageRouteBuilder<List<AssetEntity>>? pageRouteBuilder,
   }) async {
-    final PermissionState _ps = await permissionCheck();
+    final PermissionState ps = await permissionCheck();
+    final AssetPickerPageRoute<List<AssetEntity>> route =
+        pageRouteBuilder?.call(const SizedBox.shrink()) ??
+            AssetPickerPageRoute<List<AssetEntity>>(
+              builder: (_) => const SizedBox.shrink(),
+            );
     final DefaultAssetPickerProvider provider = DefaultAssetPickerProvider(
       maxAssets: pickerConfig.maxAssets,
       pageSize: pickerConfig.pageSize,
@@ -75,12 +80,13 @@ class AssetPickerDelegate {
       requestType: pickerConfig.requestType,
       sortPathDelegate: pickerConfig.sortPathDelegate,
       filterOptions: pickerConfig.filterOptions,
+      initializeDelayDuration: route.transitionDuration,
     );
     final Widget picker = AssetPicker<AssetEntity, AssetPathEntity>(
-      key: Singleton.pickerKey,
+      key: key,
       builder: DefaultAssetPickerBuilderDelegate(
         provider: provider,
-        initialPermission: _ps,
+        initialPermission: ps,
         gridCount: pickerConfig.gridCount,
         pickerTheme: pickerConfig.pickerTheme,
         gridThumbnailSize: pickerConfig.gridThumbnailSize,
@@ -130,12 +136,13 @@ class AssetPickerDelegate {
       PickerProvider extends AssetPickerProvider<Asset, Path>>(
     BuildContext context, {
     required AssetPickerBuilderDelegate<Asset, Path> delegate,
+    Key? key,
     bool useRootNavigator = true,
     AssetPickerPageRouteBuilder<List<Asset>>? pageRouteBuilder,
   }) async {
     await permissionCheck();
     final Widget picker = AssetPicker<Asset, Path>(
-      key: Singleton.pickerKey,
+      key: key,
       builder: delegate,
     );
     final List<Asset>? result = await Navigator.of(
@@ -221,7 +228,7 @@ class AssetPickerDelegate {
         buttonTheme: ButtonThemeData(buttonColor: themeColor),
         colorScheme: ColorScheme(
           primary: Colors.grey[50]!,
-          primaryVariant: Colors.grey[50]!,
+          primaryVariant: Colors.grey[50],
           secondary: themeColor,
           secondaryVariant: themeColor,
           background: Colors.grey[50]!,
@@ -262,7 +269,7 @@ class AssetPickerDelegate {
       buttonTheme: ButtonThemeData(buttonColor: themeColor),
       colorScheme: ColorScheme(
         primary: Colors.grey[900]!,
-        primaryVariant: Colors.grey[900]!,
+        primaryVariant: Colors.grey[900],
         secondary: themeColor,
         secondaryVariant: themeColor,
         background: Colors.grey[900]!,

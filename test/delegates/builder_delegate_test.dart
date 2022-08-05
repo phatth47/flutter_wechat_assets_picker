@@ -11,7 +11,7 @@ void main() {
   PhotoManager.withPlugin(TestPhotoManagerPlugin());
   AssetPicker.setPickerDelegate(TestAssetPickerDelegate());
 
-  final Finder _defaultButtonFinder = find.byType(TextButton);
+  final Finder defaultButtonFinder = find.byType(TextButton);
 
   Widget _defaultApp({void Function(BuildContext)? onButtonPressed}) {
     return MaterialApp(
@@ -41,18 +41,18 @@ void main() {
         },
       ),
     );
-    await tester.tap(_defaultButtonFinder);
+    await tester.tap(defaultButtonFinder);
     await tester.pumpAndSettle();
     await tester.tap(find.byIcon(Icons.keyboard_arrow_down));
     await tester.pumpAndSettle();
-    expect(find.text('testPathNameBuilder'), findsNWidgets(2));
+    expect(find.text('testPathNameBuilder'), findsOneWidget);
   });
 }
 
 class TestPhotoManagerPlugin extends PhotoManagerPlugin {
   @override
   Future<PermissionState> requestPermissionExtend(
-    PermisstionRequestOption requestOption,
+    PermissionRequestOption requestOption,
   ) {
     return SynchronousFuture<PermissionState>(PermissionState.authorized);
   }
@@ -67,11 +67,12 @@ class TestAssetPickerDelegate extends AssetPickerDelegate {
   @override
   Future<List<AssetEntity>?> pickAssets(
     BuildContext context, {
+    Key? key,
     AssetPickerConfig pickerConfig = const AssetPickerConfig(),
     bool useRootNavigator = true,
     AssetPickerPageRouteBuilder<List<AssetEntity>>? pageRouteBuilder,
   }) async {
-    final PermissionState _ps = await permissionCheck();
+    final PermissionState ps = await permissionCheck();
     final AssetPathEntity pathEntity = AssetPathEntity(
       id: 'test',
       name: 'pathEntity',
@@ -90,13 +91,17 @@ class TestAssetPickerDelegate extends AssetPickerDelegate {
       ..currentAssets = <AssetEntity>[
         const AssetEntity(id: 'test', typeInt: 0, width: 0, height: 0),
       ]
-      ..currentPath = pathEntity
+      ..currentPath = PathWrapper<AssetPathEntity>(
+        path: pathEntity,
+        assetCount: 1,
+      )
       ..hasAssetsToDisplay = true
-      ..setPathThumbnail(pathEntity, null);
+      ..totalAssetsCount = 1;
     final Widget picker = AssetPicker<AssetEntity, AssetPathEntity>(
+      key: key,
       builder: DefaultAssetPickerBuilderDelegate(
         provider: provider,
-        initialPermission: _ps,
+        initialPermission: ps,
         gridCount: pickerConfig.gridCount,
         pickerTheme: pickerConfig.pickerTheme,
         gridThumbnailSize: pickerConfig.gridThumbnailSize,

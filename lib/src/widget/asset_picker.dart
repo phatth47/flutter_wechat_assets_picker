@@ -15,7 +15,7 @@ import 'asset_picker_page_route.dart';
 AssetPickerDelegate _pickerDelegate = const AssetPickerDelegate();
 
 class AssetPicker<Asset, Path> extends StatefulWidget {
-  const AssetPicker({Key? key, required this.builder}) : super(key: key);
+  const AssetPicker({super.key, required this.builder});
 
   final AssetPickerBuilderDelegate<Asset, Path> builder;
 
@@ -38,12 +38,14 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
   /// {@macro wechat_assets_picker.delegates.AssetPickerDelegate.pickAssets}
   static Future<List<AssetEntity>?> pickAssets(
     BuildContext context, {
+    Key? key,
     AssetPickerConfig pickerConfig = const AssetPickerConfig(),
     bool useRootNavigator = true,
     AssetPickerPageRouteBuilder<List<AssetEntity>>? pageRouteBuilder,
   }) {
     return _pickerDelegate.pickAssets(
       context,
+      key: key,
       pickerConfig: pickerConfig,
       useRootNavigator: useRootNavigator,
       pageRouteBuilder: pageRouteBuilder,
@@ -54,12 +56,14 @@ class AssetPicker<Asset, Path> extends StatefulWidget {
   static Future<List<Asset>?> pickAssetsWithDelegate<Asset, Path,
       PickerProvider extends AssetPickerProvider<Asset, Path>>(
     BuildContext context, {
+    Key? key,
     required AssetPickerBuilderDelegate<Asset, Path> delegate,
     bool useRootNavigator = true,
     AssetPickerPageRouteBuilder<List<Asset>>? pageRouteBuilder,
   }) {
     return _pickerDelegate.pickAssetsWithDelegate<Asset, Path, PickerProvider>(
       context,
+      key: key,
       delegate: delegate,
       useRootNavigator: useRootNavigator,
       pageRouteBuilder: pageRouteBuilder,
@@ -91,7 +95,7 @@ class AssetPickerState<Asset, Path> extends State<AssetPicker<Asset, Path>>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance!.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
     AssetPicker.registerObserve(_onLimitedAssetsUpdated);
     widget.builder.initState(this);
   }
@@ -108,7 +112,7 @@ class AssetPickerState<Asset, Path> extends State<AssetPicker<Asset, Path>>
 
   @override
   void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     AssetPicker.unregisterObserve(_onLimitedAssetsUpdated);
     widget.builder.dispose();
     super.dispose();
