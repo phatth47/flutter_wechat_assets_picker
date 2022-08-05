@@ -895,7 +895,7 @@ class VietnameseAssetPickerTextDelegate extends AssetPickerTextDelegate {
       'Cập nhật nội dung có thể truy cập';
 
   @override
-  String get accessAllTip => 'Bạn đã cấp quyền cho Octosells chọn một vài ảnh nhất định';
+  String get accessAllTip => 'Bạn đã cấp quyền cho Octosells chọn một vài ảnh nhất định.';
 
   @override
   String get goToSystemSettings => 'Thay đổi quyền tại đây';
