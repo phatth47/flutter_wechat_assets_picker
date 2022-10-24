@@ -4,7 +4,7 @@
 
 import 'dart:io';
 import 'dart:math' as math;
-import 'dart:typed_data';
+import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -332,14 +332,16 @@ class FileAssetPickerProvider extends AssetPickerProvider<File, Directory> {
   }
 
   @override
-  Future<Uint8List?> getThumbnailFromPath(PathWrapper<Directory> path) async {
+  Future<typed_data.Uint8List?> getThumbnailFromPath(
+    PathWrapper<Directory> path,
+  ) async {
     final List<FileSystemEntity> entities =
         path.path.listSync().whereType<File>().toList();
     currentAssets.clear();
     for (final FileSystemEntity entity in entities) {
       final String extension = basename(entity.path).split('.').last;
       if (entity is File && imagesExtensions.contains(extension)) {
-        final Uint8List data = await entity.readAsBytes();
+        final typed_data.Uint8List data = await entity.readAsBytes();
         return data;
       }
     }
@@ -460,8 +462,7 @@ class FileAssetPickerBuilder
                               child: Column(
                                 children: <Widget>[
                                   Expanded(child: assetsGridBuilder(context)),
-                                  if (!isSingleAssetMode)
-                                    bottomActionBar(context),
+                                  if (!isAppleOS) bottomActionBar(context),
                                 ],
                               ),
                             ),
@@ -537,6 +538,29 @@ class FileAssetPickerBuilder
         ),
         appBar(context),
       ],
+    );
+  }
+
+  @override
+  Widget loadingIndicator(BuildContext context) {
+    return Selector<FileAssetPickerProvider, bool>(
+      selector: (_, FileAssetPickerProvider p) => p.isAssetsEmpty,
+      builder: (BuildContext context, bool isAssetsEmpty, Widget? w) {
+        if (loadingIndicatorBuilder != null) {
+          return loadingIndicatorBuilder!(context, isAssetsEmpty);
+        }
+        return Center(child: isAssetsEmpty ? emptyIndicator(context) : w);
+      },
+      child: Center(
+        child: SizedBox.fromSize(
+          size: Size.square(Screens.width / gridCount / 3),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+              theme.iconTheme.color ?? Colors.grey,
+            ),
+          ),
+        ),
+      ),
     );
   }
 
@@ -771,31 +795,6 @@ class FileAssetPickerBuilder
   }
 
   @override
-  Widget loadingIndicator(BuildContext context) {
-    return Center(
-      child: Selector<FileAssetPickerProvider, bool>(
-        selector: (_, FileAssetPickerProvider p) => p.isAssetsEmpty,
-        builder: (_, bool isAssetsEmpty, __) {
-          if (isAssetsEmpty) {
-            return Text(textDelegate.emptyList);
-          } else {
-            return Center(
-              child: SizedBox.fromSize(
-                size: Size.square(Screens.width / gridCount / 3),
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    theme.iconTheme.color ?? Colors.grey,
-                  ),
-                ),
-              ),
-            );
-          }
-        },
-      ),
-    );
-  }
-
-  @override
   Widget pathEntityListBackdrop(BuildContext context) {
     return ValueListenableBuilder<bool>(
       valueListenable: isSwitchingPath,
@@ -940,7 +939,7 @@ class FileAssetPickerBuilder
   }) {
     final PathWrapper<Directory> wrapper = list[index];
     final Directory path = wrapper.path;
-    final Uint8List? data = wrapper.thumbnailData;
+    final typed_data.Uint8List? data = wrapper.thumbnailData;
 
     Widget builder() {
       if (data != null) {

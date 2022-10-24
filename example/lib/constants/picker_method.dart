@@ -379,6 +379,24 @@ class PickMethod {
     );
   }
 
+  factory PickMethod.pathNameBuilder(int maxAssetsCount) {
+    return PickMethod(
+      icon: '🈸',
+      name: 'Path name builder',
+      description: 'Add 🍭 after paths name.',
+      method: (BuildContext context, List<AssetEntity> assets) {
+        return AssetPicker.pickAssets(
+          context,
+          pickerConfig: AssetPickerConfig(
+            maxAssets: maxAssetsCount,
+            selectedAssets: assets,
+            pathNameBuilder: (AssetPathEntity path) => '${path.name}🍭',
+          ),
+        );
+      },
+    );
+  }
+
   final String icon;
   final String name;
   final String description;

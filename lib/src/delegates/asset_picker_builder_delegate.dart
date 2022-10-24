@@ -2,11 +2,9 @@
 // Use of this source code is governed by an Apache license that can be found
 // in the LICENSE file.
 
-import 'dart:async';
-import 'dart:io';
+import 'dart:io' show Platform;
 import 'dart:math' as math;
-import 'dart:typed_data';
-import 'dart:ui' as ui;
+import 'dart:typed_data' as typed_data;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -359,6 +357,16 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
   /// Android设备的选择器布局
   Widget androidLayout(BuildContext context);
 
+  /// Loading indicator.
+  /// 加载指示器
+  ///
+  /// Subclasses need to implement this due to the generic type limitation, and
+  /// not all delegates use [AssetPickerProvider].
+  ///
+  /// See also:
+  /// - [DefaultAssetPickerBuilderDelegate.loadingIndicator] as an example.
+  Widget loadingIndicator(BuildContext context);
+
   /// GIF image type indicator.
   /// GIF 类型图片指示
   Widget gifIndicator(BuildContext context, Asset asset) {
@@ -414,29 +422,8 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     );
   }
 
-  /// Loading indicator.
-  /// 加载指示器
-  Widget loadingIndicator(BuildContext context) {
-    return Center(
-      child: Selector<AssetPickerProvider<Asset, Path>, bool>(
-        selector: (_, AssetPickerProvider<Asset, Path> p) => p.isAssetsEmpty,
-        builder: (BuildContext c, bool isAssetsEmpty, Widget? w) {
-          if (loadingIndicatorBuilder != null) {
-            return loadingIndicatorBuilder!(c, isAssetsEmpty);
-          }
-          if (isAssetsEmpty) {
-            return emptyIndicator(context);
-          }
-          return w!;
-        },
-        child: PlatformProgressIndicator(
-          color: theme.iconTheme.color,
-          size: context.mediaQuery.size.width / gridCount / 3,
-        ),
-      ),
-    );
-  }
-
+  /// Indicator when no assets were found from the current path.
+  /// 当前目录下无资源的显示
   Widget emptyIndicator(BuildContext context) {
     return ScaleText(
       textDelegate.emptyList,
@@ -547,11 +534,11 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
     // );
     final double heightBottomAction =
         bottomActionBarHeight + context.bottomPadding;
-    Widget child = SizedBox(
+    final Widget child = SizedBox(
       height: heightBottomAction + 30,
       child: Stack(
         alignment: Alignment.bottomCenter,
-        children: [
+        children: <Widget> [
           Container(
             height: heightBottomAction,
             padding: const EdgeInsets.symmetric(horizontal: 20).copyWith(
@@ -569,7 +556,7 @@ abstract class AssetPickerBuilderDelegate<Asset, Path> {
                 color: Colors.grey,
                 borderRadius: BorderRadius.circular(30),
               ),
-              child: Icon(Icons.send, color: Colors.blue),
+              child: const Icon(Icons.send, color: Colors.blue),
             ),
           )
         ],
@@ -934,7 +921,6 @@ class DefaultAssetPickerBuilderDelegate
     return AssetPickerAppBar(
       // backgroundColor: lightColor,
       backgroundColor: theme.appBarTheme.backgroundColor,
-      centerTitle: true,
       title: Semantics(
         onTapHint: semanticsTextDelegate.sActionSwitchPathLabel,
         child: pathEntitySelector(context),
@@ -944,16 +930,7 @@ class DefaultAssetPickerBuilderDelegate
       // - On Android, show if preview is enabled or if multi asset mode.
       //   If no preview and single asset mode, do not show confirm button,
       //   because any click on an asset selects it.
-      // - On iOS, show if no preview and multi asset mode. This is because for iOS
-      //   the [bottomActionBar] has the confirm button, but if no preview,
-      //   [bottomActionBar] is not displayed.
-      // actions: (!isAppleOS || !isPreviewEnabled) &&
-      //         (isPreviewEnabled || !isSingleAssetMode)
-      //     ? <Widget>[confirmButton(context)]
-      //     : null,
       actionsPadding: const EdgeInsetsDirectional.only(end: 14),
-      // blurRadius: isAppleOS ? appleOSBlurRadius : 0,
-      blurRadius: 0,
     );
   }
 
@@ -1003,7 +980,6 @@ class DefaultAssetPickerBuilderDelegate
               children: <Widget>[
                 Positioned.fill(
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       if (isPermissionLimited) ...<Widget>[
                         SizedBox(
@@ -1100,11 +1076,28 @@ class DefaultAssetPickerBuilderDelegate
   }
 
   @override
+  Widget loadingIndicator(BuildContext context) {
+    return Selector<DefaultAssetPickerProvider, bool>(
+      selector: (_, DefaultAssetPickerProvider p) => p.isAssetsEmpty,
+      builder: (BuildContext context, bool isAssetsEmpty, Widget? w) {
+        if (loadingIndicatorBuilder != null) {
+          return loadingIndicatorBuilder!(context, isAssetsEmpty);
+        }
+        return Center(child: isAssetsEmpty ? emptyIndicator(context) : w);
+      },
+      child: PlatformProgressIndicator(
+        color: theme.iconTheme.color,
+        size: context.mediaQuery.size.width / gridCount / 3,
+      ),
+    );
+  }
+
+  @override
   Widget assetsGridBuilder(BuildContext context) {
     return Selector<DefaultAssetPickerProvider, PathWrapper<AssetPathEntity>?>(
       selector: (_, DefaultAssetPickerProvider p) => p.currentPath,
       builder: (
-        BuildContext context,
+        BuildContext _context,
         PathWrapper<AssetPathEntity>? wrapper,
         __,
       ) {
@@ -1114,7 +1107,7 @@ class DefaultAssetPickerBuilderDelegate
         // If user chose a special item's position, add 1 count.
         if (specialItemPosition != SpecialItemPosition.none) {
           specialItem = specialItemBuilder?.call(
-            context,
+            _context,
             wrapper?.path,
             totalCount,
           );
@@ -1125,8 +1118,7 @@ class DefaultAssetPickerBuilderDelegate
           specialItem = null;
         }
         if (totalCount == 0 && specialItem == null) {
-          return loadingIndicatorBuilder?.call(context, true) ??
-              loadingIndicator(context);
+          return loadingIndicator(_context);
         }
         // Then we use the [totalCount] to calculate placeholders we need.
         final int placeholderCount;
@@ -1147,11 +1139,11 @@ class DefaultAssetPickerBuilderDelegate
         final double topPadding =
             isPermissionLimited ? 0 : context.topPadding + kToolbarHeight;
 
-        Widget _sliverGrid(BuildContext context, List<AssetEntity> assets) {
+        Widget _sliverGrid(BuildContext _context, List<AssetEntity> assets) {
           return SliverGrid(
             delegate: SliverChildBuilderDelegate(
               (_, int index) => Builder(
-                builder: (BuildContext context) {
+                builder: (BuildContext _context) {
                   if (effectiveShouldRevertGrid) {
                     if (index < placeholderCount) {
                       return const SizedBox.shrink();
@@ -1162,7 +1154,7 @@ class DefaultAssetPickerBuilderDelegate
                     child: Directionality(
                       textDirection: Directionality.of(context),
                       child: assetGridItemBuilder(
-                        context,
+                        _context,
                         index,
                         assets,
                         specialItem: specialItem,
@@ -1172,7 +1164,7 @@ class DefaultAssetPickerBuilderDelegate
                 },
               ),
               childCount: assetsGridItemCount(
-                context: context,
+                context: _context,
                 assets: assets,
                 placeholderCount: placeholderCount,
                 specialItem: specialItem,
@@ -1199,7 +1191,7 @@ class DefaultAssetPickerBuilderDelegate
         }
 
         return LayoutBuilder(
-          builder: (BuildContext c, BoxConstraints constraints) {
+          builder: (BuildContext context, BoxConstraints constraints) {
             final double itemSize = constraints.maxWidth / gridCount;
             // Check whether all rows can be placed at the same time.
             final bool onlyOneScreen = row * itemSize <=
@@ -1231,7 +1223,7 @@ class DefaultAssetPickerBuilderDelegate
                 child: Selector<DefaultAssetPickerProvider, List<AssetEntity>>(
                   selector: (_, DefaultAssetPickerProvider p) =>
                       p.currentAssets,
-                  builder: (_, List<AssetEntity> assets, __) {
+                  builder: (BuildContext context, List<AssetEntity> assets, _) {
                     final SliverGap bottomGap = SliverGap.v(
                       context.bottomPadding + bottomSectionHeight,
                     );
@@ -1242,7 +1234,7 @@ class DefaultAssetPickerBuilderDelegate
                       center: effectiveShouldRevertGrid ? gridRevertKey : null,
                       slivers: <Widget>[
                         SliverGap.v(topPadding),
-                        _sliverGrid(_, assets),
+                        _sliverGrid(context, assets),
                         // Ignore the gap when the [anchor] is not equal to 1.
                         if (effectiveShouldRevertGrid && anchor == 1) bottomGap,
                         if (effectiveShouldRevertGrid)
@@ -1614,24 +1606,6 @@ class DefaultAssetPickerBuilderDelegate
     );
   }
 
-  @override
-  Widget loadingIndicator(BuildContext context) {
-    return Center(
-      child: Selector<DefaultAssetPickerProvider, bool>(
-        selector: (_, DefaultAssetPickerProvider p) => p.isAssetsEmpty,
-        builder: (BuildContext context, bool isAssetsEmpty, __) {
-          if (isAssetsEmpty) {
-            return emptyIndicator(context);
-          }
-          return PlatformProgressIndicator(
-            color: theme.iconTheme.color,
-            size: context.mediaQuery.size.width / gridCount / 3,
-          );
-        },
-      ),
-    );
-  }
-
   /// While the picker is switching path, this will displayed.
   /// If the user tapped on it, it'll collapse the list widget.
   ///
@@ -1879,7 +1853,7 @@ class DefaultAssetPickerBuilderDelegate
   }) {
     final PathWrapper<AssetPathEntity> wrapper = list[index];
     final AssetPathEntity pathEntity = wrapper.path;
-    final Uint8List? data = wrapper.thumbnailData;
+    final typed_data.Uint8List? data = wrapper.thumbnailData;
 
     Widget builder() {
       if (data != null) {

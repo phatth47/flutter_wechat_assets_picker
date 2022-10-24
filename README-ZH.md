@@ -8,7 +8,7 @@ that can be found in the LICENSE file. -->
 [![pub package](https://img.shields.io/pub/v/wechat_assets_picker?color=42a012&include_prereleases&label=%E5%BC%80%E5%8F%91%E7%89%88&logo=dart&style=flat-square)](https://pub.flutter-io.cn/packages/wechat_assets_picker)
 [![Build status](https://img.shields.io/github/workflow/status/fluttercandies/flutter_wechat_assets_picker/Build%20test?label=%E7%8A%B6%E6%80%81&logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/actions?query=workflow%3A%22Build+test%22)
 [![CodeFactor](https://img.shields.io/codefactor/grade/github/fluttercandies/flutter_wechat_assets_picker?label=%E4%BB%A3%E7%A0%81%E8%B4%A8%E9%87%8F&logo=codefactor&logoColor=%23ffffff&style=flat-square)](https://www.codefactor.io/repository/github/fluttercandies/flutter_wechat_assets_picker)
-[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_wechat_assets_picker?label=%E5%8D%8F%E8%AE%AE&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/master/LICENSE)
+[![GitHub license](https://img.shields.io/github/license/fluttercandies/flutter_wechat_assets_picker?label=%E5%8D%8F%E8%AE%AE&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/blob/main/LICENSE)
 
 [![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://github.com/Solido/awesome-flutter)
 [![GitHub stars](https://img.shields.io/github/stars/fluttercandies/flutter_wechat_assets_picker?logo=github&style=flat-square)](https://github.com/fluttercandies/flutter_wechat_assets_picker/stargazers)
@@ -41,6 +41,7 @@ Language: [English](README.md) | 中文
   * [版本兼容](#版本兼容)
   * [Flutter](#flutter)
   * [Android](#android)
+    * [权限](#权限)
   * [iOS](#ios)
   * [macOS](#macos)
 * [使用方法](#使用方法-)
@@ -69,13 +70,14 @@ Language: [English](README.md) | 中文
   - 🔬 HEIF 格式图片支持
 - 🎥 视频资源支持
 - 🎶 音频资源支持
+  - ⚠️ 由于 iOS/macOS 系统限制，仅支持应用沙盒内获取音频资源
 - 1️⃣ 单资源模式
 - 💱 国际化支持
   - ⏪ RTL 语言支持
-- ➕ 特殊 widget 构建支持（前置/后置）
+- ➕ 特殊 widget 构建支持
 - 🗂 自定义路径排序支持
 - 📝 自定义文本构建支持
-- ⏳ 自定义筛选规则支持（ `photo_manager` ）
+- ⏳ 自定义筛选规则支持
 - 🎏 完整的自定义主题
 - 💻 支持 MacOS
 
@@ -101,11 +103,12 @@ Language: [English](README.md) | 中文
 
 ### 版本兼容
 
-|        | 2.8.0 | 2.10.0 | 3.0.0 |
-|--------|:-----:|:------:|:-----:|
-| 7.3.0+ |  不适用  |  不适用   |   ✅   |
-| 7.0.0+ |   ✅   |   ✅    |   ❌   |
-| 6.3.0+ |   ✅   |   ✅    |   ❌   |
+|        | 2.8.0 | 2.10.0 | 3.0.0 | 3.3.0 |
+|--------|:-----:|:------:|:-----:|:-----:|
+| 8.0.0+ |  不适用  |  不适用   |   ✅   |   ✅   |
+| 7.3.0+ |  不适用  |  不适用   |   ✅   |   ✅   |
+| 7.0.0+ |   ✅   |   ✅    |   ❌   |   ❌   |
+| 6.3.0+ |   ✅   |   ✅    |   ❌   |   ❌   |
 
 如果在 `flutter pub get` 时遇到了 `resolve conflict` 失败问题，
 请使用 `dependency_overrides` 解决。
@@ -134,31 +137,49 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ### Android
 
-需要声明的权限：`READ_EXTERNAL_STORAGE`（已声明）.
-可选声明的权限：`WRITE_EXTERNAL_STORAGE`、`ACCESS_MEDIA_LOCATION`.
-
-如果你的目标 SDK 版本大于 29，
-你必须声明在 `AndroidManifest.xml` 的 `<application>` 节点中
-声明 `requestLegacyExternalStorage`。
-详情请参考示例。
-
 如果你发现有一些与 `Glide` 有关的警告日志输出，
 那么主项目就需要实现 `AppGlideModule`。
 详细信息请查看 [Generated API 文档][]。
 
+#### 权限
+
+| Name                     | 必需  | 已声明 | 最高 API 版本 | 其他          |
+|--------------------------|-----|-----|-----------|-------------|
+| `READ_EXTERNAL_STORAGE`  | 是   | 是   | 32        |             |
+| `WRITE_EXTERNAL_STORAGE` | 否   | 否   | 29        |             |
+| `ACCESS_MEDIA_LOCATION`  | 是*  | 否   | N/A       | 读取 EXIF 时必需 |
+| `READ_MEDIA_IMAGES`      | 是*  | 是   | N/A       | 读取图片时必需     | 
+| `READ_MEDIA_VIDEO`       | 是*  | 是   | N/A       | 读取视频时必需     | 
+| `READ_MEDIA_AUDIO`       | 是*  | 是   | N/A       | 读取音频时必需     |
+
+如果你的目标 SDK 版本大于 33，且你不需要获取图片、视频或者音频，
+你可以考虑将对应权限移除：
+
+```xml
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.your.app">
+    <!-- 如果不需要获取图片，移除 READ_MEDIA_IMAGES -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" tools:node="remove" />
+    <!-- 如果不需要获取视频，移除 READ_MEDIA_VIDEO -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" tools:node="remove" />
+    <!-- 如果不需要获取音频，移除 READ_MEDIA_AUDIO -->
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" tools:node="remove" />
+</manifest>
+```
+
 ### iOS
 
 1. 在 `ios/Podfile` 中指定最低构建版本至 **9.0**。
-```ruby
-platform :ios, '9.0'
-```
-
+   ```ruby
+   platform :ios, '9.0'
+   ```
 2. 将以下内容添加至 `info.plist`。
 ```plist
 <key>NSAppTransportSecurity</key>
 <dict>
 	<key>NSAllowsArbitraryLoads</key>
-  <true/>
+	<true/>
 </dict>
 <key>NSPhotoLibraryUsageDescription</key>
 <string>你的相册权限描述</string>
@@ -167,9 +188,9 @@ platform :ios, '9.0'
 ### macOS
 
 1. 在 `macos/Podfile` 中指定最低构建版本至 **10.15**。
-```ruby
-platform :osx, '10.15'
-```
+   ```ruby
+   platform :osx, '10.15'
+   ```
 2. 使用 **Xcode** 打开 `macos/Runner.xcworkspace`。
    接着根据下面的截图将最低构建版本提升至 **10.15**。
 3. ![step 1](https://tva1.sinaimg.cn/large/007S8ZIlgy1ghw67v4yk4j30qy0b50u0.jpg)
@@ -368,7 +389,7 @@ W/Glide   (21133): Failed to find GeneratedAppGlideModule. You should include an
 [IntelliJ IDEA](https://www.jetbrains.com/idea/?from=fluttercandies)
 等 IDE 的授权。
 
-[<img src="https://github.com/fluttercandies/flutter_wechat_assets_picker/raw/master/.github/jetbrains-variant.png" width="200"/>](https://www.jetbrains.com/?from=fluttercandies)
+[<img src="https://github.com/fluttercandies/flutter_wechat_assets_picker/raw/main/.github/jetbrains-variant.png" width="200"/>](https://www.jetbrains.com/?from=fluttercandies)
 
 
 [photo_manager pub]: https://pub.flutter-io.cn/packages/photo_manager
